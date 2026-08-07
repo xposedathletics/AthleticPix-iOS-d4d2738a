@@ -64,7 +64,7 @@ struct HomeView: View {
         .sheet(isPresented:$showTech)  { TechModal().environmentObject(tech) }
         .sheet(isPresented:$showEquip) { EquipModal().environmentObject(tech) }
         .sheet(isPresented:$showForm)  { AthleteFormView(athlete:$formAthlete).environmentObject(store) }
-        .fullScreenCover(isPresented:$sportStep) { SportPositionFlow().environmentObject(store).environmentObject(session).environmentObject(tech) }
+        .sheet(isPresented:$sportStep) { SportPositionFlow().environmentObject(store).environmentObject(session).environmentObject(tech) }
     }
 }
  
@@ -154,5 +154,128 @@ struct EmptyAthleteCard: View {
             Text("No athletes — add one to get started").font(.system(size:13)).foregroundColor(AP.muted).multilineTextAlignment(.center)
             GradBtn(title:"+ Add Athlete", action:action)
         }.padding(24).frame(maxWidth:.infinity).background(AP.card).overlay(RoundedRectangle(cornerRadius:14).stroke(AP.border,lineWidth:1)).cornerRadius(14)
+    }
+}
+
+struct TechModal: View {
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var tech: TechManager
+
+    var body: some View {
+        NavigationView {
+            List {
+                Section("Wearable") {
+                    ForEach(WEARABLE_DEVICES, id:\.self) { device in
+                        Button(device) { tech.connectWearable(device:device) }
+                    }
+                    if tech.wearableConnected { Button("Disconnect Wearable") { tech.disconnectWearable() } }
+                }
+                Section("Camera") {
+                    ForEach(CAMERA_SYSTEMS, id:\.self) { system in
+                        Button(system) { tech.connectCamera(system:system) }
+                    }
+                    if tech.cameraConnected { Button("Disconnect Camera") { tech.disconnectCamera() } }
+                }
+                Section("SMARTSPEED") {
+                    ForEach(SMARTSPEED_SYSTEMS, id:\.self) { system in
+                        Button(system) { tech.connectSMARTSPEED(system:system) }
+                    }
+                    if tech.smartspeedConnected { Button("Disconnect SMARTSPEED") { tech.disconnectSMARTSPEED() } }
+                }
+            }
+            .navigationTitle("Training Tech")
+            .toolbar { Button("Done") { dismiss() } }
+        }
+    }
+}
+
+struct EquipModal: View {
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var tech: TechManager
+
+    var body: some View {
+        NavigationView {
+            List(EQUIPMENT_OPTIONS, id:\.self) { item in
+                Button {
+                    if tech.equipment.contains(item) {
+                        tech.equipment.removeAll { $0 == item }
+                    } else {
+                        tech.equipment.append(item)
+                    }
+                } label: {
+                    HStack {
+                        Text(item)
+                        Spacer()
+                        if tech.equipment.contains(item) { Image(systemName:"checkmark") }
+                    }
+                }
+            }
+            .navigationTitle("Equipment")
+            .toolbar { Button("Done") { dismiss() } }
+        }
+    }
+}
+
+struct AthleteFormView: View {
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var store: AthleteStore
+    @Binding var athlete: Athlete
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section("Profile") {
+                    TextField("Full name", text:$athlete.full_name)
+                    TextField("Date of birth", text:$athlete.dob)
+                    Picker("Gender", selection:$athlete.gender) {
+                        Text("Male").tag("Male")
+                        Text("Female").tag("Female")
+                    }
+                    TextField("School", text:$athlete.school)
+                    TextField("Graduation year", text:$athlete.grad_year)
+                }
+
+                Section("Metrics") {
+                    TextField("GPA", value:$athlete.gpa, format:.number)
+                    TextField("Height inches", value:$athlete.height_in, format:.number)
+                    TextField("Weight lbs", value:$athlete.weight_lbs, format:.number)
+                    TextField("Body fat %", value:$athlete.body_fat_pct, format:.number)
+                    TextField("Wingspan inches", value:$athlete.wingspan_in, format:.number)
+                    TextField("Hand size inches", value:$athlete.hand_size_in, format:.number)
+                }
+
+                Section("Sports") {
+                    ForEach(SPORT_CONFIG.keys.sorted(), id:\.self) { sport in
+                        Button {
+                            if athlete.sports.contains(sport) {
+                                athlete.sports.removeAll { $0 == sport }
+                            } else {
+                                athlete.sports.append(sport)
+                            }
+                        } label: {
+                            HStack {
+                                Text(sport)
+                                Spacer()
+                                if athlete.sports.contains(sport) { Image(systemName:"checkmark") }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Athlete")
+            .toolbar {
+                ToolbarItem(placement:.cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement:.confirmationAction) {
+                    Button("Save") {
+                        athlete.age = ageFrom(dob:athlete.dob)
+                        store.saveAthlete(athlete)
+                        store.selected = athlete
+                        athlete = Athlete()
+                        dismiss()
+                    }
+                    .disabled(athlete.full_name.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
     }
 }

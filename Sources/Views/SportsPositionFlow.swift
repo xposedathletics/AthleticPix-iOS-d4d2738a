@@ -95,8 +95,8 @@ struct SportPositionFlow: View {
                 }.padding(20)
             }
             .background(AP.dark.ignoresSafeArea())
-            .navigationTitle("").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement:.navigationBarLeading) { Button("← Back") { dismiss() }.foregroundColor(AP.muted) } }
+            .navigationTitle("")
+            .toolbar { ToolbarItem(placement:.cancellationAction) { Button("← Back") { dismiss() }.foregroundColor(AP.muted) } }
         }
         .preferredColorScheme(.dark)
     }

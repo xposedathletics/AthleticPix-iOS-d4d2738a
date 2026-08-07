@@ -46,7 +46,7 @@ struct CompleteView: View {
                         sendEmails()
                     } label: {
                         Text(sending ? "Sending…" : sent ? "✅ Emails Sent!" : "📧 Send Completion Emails").font(.system(size:14,weight:.black)).frame(maxWidth:.infinity).padding(14)
-                            .background(sent ? Color(hex:"146428") : LinearGradient(colors:[AP.gradStart,AP.gradEnd],startPoint:.leading,endPoint:.trailing))
+                            .background(LinearGradient(colors: sent ? [Color(hex:"146428"), Color(hex:"146428")] : [AP.gradStart, AP.gradEnd], startPoint:.leading, endPoint:.trailing))
                             .foregroundColor(.white).cornerRadius(12)
                     }.disabled(sending)
  

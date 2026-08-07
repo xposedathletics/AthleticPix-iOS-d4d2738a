@@ -142,7 +142,7 @@ struct DrillCard: View {
                     session.toggleClock(); tech.isRunning = session.drillRunning
                 } label: {
                     Text(session.drillRunning ? "⏸ Pause" : "▶ Start Drill").font(.system(size:15,weight:.black)).frame(maxWidth:.infinity).padding(12)
-                        .background(session.drillRunning ? Color(hex:"8B1A1A").opacity(0.5) : LinearGradient(colors:[AP.gradStart,AP.gradEnd],startPoint:.leading,endPoint:.trailing))
+                        .background(LinearGradient(colors: session.drillRunning ? [Color(hex:"8B1A1A").opacity(0.5), Color(hex:"8B1A1A").opacity(0.5)] : [AP.gradStart, AP.gradEnd], startPoint:.leading, endPoint:.trailing))
                         .foregroundColor(.white).cornerRadius(10)
                 }
                 Button {

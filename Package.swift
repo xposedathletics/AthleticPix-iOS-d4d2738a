@@ -3,11 +3,11 @@ import PackageDescription
  
 let package = Package(
     name: "AthletixPro",
-    platforms: [.iOS(.v17)],
+    platforms: [.iOS(.v17), .macOS(.v12)],
     targets: [
         .executableTarget(
             name: "AthletixPro",
-            path: ".",
+            path: "Sources",
             sources: [
                 "App/AthletixProApp.swift",
                 "Brand/Brand.swift",
@@ -18,10 +18,10 @@ let package = Package(
                 "Engine/AthleteStore.swift",
                 "Engine/TechManager.swift",
                 "Session/TrainingSession.swift",
-                "Views/ContentRootView.swift",
+                "Views/ContentRoot.swift",
                 "Views/HomeView.swift",
-                "Views/SportPositionFlow.swift",
-                "Views/ActiveSessionView.swift",
+                "Views/SportsPositionFlow.swift",
+                "Views/ActivesSession.swift",
                 "Views/CompleteView.swift"
             ]
         )
